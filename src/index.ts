@@ -1,0 +1,1 @@
+export { GooddollarSavingsWidget } from './staking-widget'; 
