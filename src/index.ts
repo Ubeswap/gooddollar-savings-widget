@@ -1,1 +1,2 @@
-export { GooddollarSavingsWidget } from './staking-widget'; 
+export { GooddollarSavingsWidget } from './GooddollarSavingsWidget';
+

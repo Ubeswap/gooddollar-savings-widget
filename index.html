@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gooddollar Savings Widget - Test Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        h1 {
+            color: #2d3748;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .widget-section {
+            margin-bottom: 40px;
+        }
+        .widget-section h2 {
+            color: #4a5568;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        .controls {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .controls label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        .controls input, .controls button {
+            margin-right: 10px;
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            border: 1px solid #cbd5e0;
+            border-radius: 4px;
+        }
+        .controls button {
+            background: #4299e1;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .controls button:hover {
+            background: #3182ce;
+        }
+        .widget-display {
+            border: 2px dashed #cbd5e0;
+            padding: 20px;
+            border-radius: 8px;
+            background: #fafbfc;
+        }
+        .status {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .status.connected {
+            background: #c6f6d5;
+            color: #22543d;
+            border: 1px solid #9ae6b4;
+        }
+        .status.disconnected {
+            background: #fed7d7;
+            color: #742a2a;
+            border: 1px solid #feb2b2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Gooddollar Savings Widget - Test Page</h1>
+
+        <div class="widget-section">
+            <h2>Widget Controls</h2>
+            <div class="controls">
+                <label>User Address:</label>
+                <input type="text" id="userAddress" placeholder="0x..." value="0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6">
+
+                <label>Web3 Provider Status:</label>
+                <button onclick="setConnected()">Set Connected</button>
+                <button onclick="setDisconnected()">Set Disconnected</button>
+
+                <div id="status" class="status disconnected">
+                    Status: Disconnected
+                </div>
+            </div>
+        </div>
+
+        <div class="widget-section">
+            <h2>Widget Display</h2>
+            <div class="widget-display">
+                <gooddollar-savings-widget
+                    id="savingsWidget"
+                    userAddress="0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6">
+                </gooddollar-savings-widget>
+            </div>
+        </div>
+
+        <div class="widget-section">
+            <h2>Usage Examples</h2>
+            <div class="controls">
+                <h3>HTML Usage:</h3>
+                <pre><code>&lt;gooddollar-savings-widget
+    userAddress="0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6"
+    .web3Provider=${web3Provider}
+    .connectWallet=${connectWalletFunction}&gt;
+&lt;/gooddollar-savings-widget&gt;</code></pre>
+
+                <h3>JavaScript Usage:</h3>
+                <pre><code>// Set web3 provider
+const widget = document.querySelector('gooddollar-savings-widget');
+widget.web3Provider = window.ethereum;
+
+// Set connect wallet callback
+widget.connectWallet = () => {
+    console.log('Connect wallet clicked!');
+    // Your wallet connection logic here
+};</code></pre>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="./src/index.ts"></script>
+    <script type="module" src="./src/test-page.ts"></script>
+</body>
+</html>
