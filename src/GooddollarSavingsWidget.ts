@@ -3,8 +3,6 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { createWalletClient, createPublicClient, parseAbi, custom, PublicClient, Transport, WalletClient, http, formatEther, parseEther } from 'viem'
 import { celo } from 'viem/chains';
 
-console.log('staking-widget.ts');
-
 const STAKING_CONTRACT_ABI = parseAbi([
   'function balanceOf(address account) view returns (uint256)',
   'function earned(address account) view returns (uint256)',
@@ -472,7 +470,6 @@ export class GooddollarSavingsWidget extends LitElement {
       });
 
       const accounts = await this.web3Provider.request({ method: 'eth_accounts' });
-      console.log('accounts', accounts);
       if (accounts.length > 0) {
         this.userAddress = accounts[0];
         await this.loadUserStats();
