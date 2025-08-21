@@ -1,73 +1,56 @@
 // Import the component
 import { GooddollarSavingsWidget } from './index';
 
-// Mock web3 provider
-let mockWeb3Provider = null;
+// Reown AppKit (vanilla JS)
+import { createAppKit } from '@reown/appkit';
+import { celo } from '@reown/appkit/networks';
+import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
 
 console.log('test-page.ts');
 
-// Mock connect wallet function
-function mockConnectWallet() {
-    console.log('Connect wallet clicked!');
-    alert('Connect wallet function called. In a real app, this would open wallet connection.');
+const projectId = '46cc09a3d487a3c2587df736300bf903'
+const wagmiAdapter = new WagmiAdapter({
+  projectId,
+  networks: [celo]
+})
+const metadata = {
+  name: 'AppKit',
+  description: 'AppKit Example',
+  url: 'https://example.com',
+  icons: ['https://avatars.githubusercontent.com/u/179229932']
 }
+
+const appKit = createAppKit({
+    adapters: [wagmiAdapter],
+    projectId,
+    networks: [celo],
+    metadata,
+    features: {
+      analytics: false // Optional - defaults to your Cloud configuration
+    }
+});
 
 // Wait for DOM to be ready
 document.addEventListener('DOMContentLoaded', () => {
-    // Get widget element
-    const widget = document.getElementById('savingsWidget') as GooddollarSavingsWidget;
+    const widget = document.getElementById('savingsWidget') as GooddollarSavingsWidget | null;
 
+    // Provide connect handler to the widget's internal button
     if (widget) {
-        // Set initial connect wallet callback
-        widget.connectWallet = mockConnectWallet;
-
-        // Update user address when input changes
-        const userAddressInput = document.getElementById('userAddress') as HTMLInputElement;
-        if (userAddressInput) {
-            userAddressInput.addEventListener('input', function(e) {
-                const target = e.target as HTMLInputElement;
-                widget.userAddress = target.value;
-            });
-        }
-
-        // Listen for widget events
-        widget.addEventListener('stake', function(e: any) {
-            console.log('Stake event:', e.detail);
-        });
-    }
-
-    // Global functions for testing
-    (window as any).setConnected = function() {
-        mockWeb3Provider = {
-            isMetaMask: true,
-            request: () => Promise.resolve('0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6')
+        widget.connectWallet = () => {
+            appKit.open?.();
         };
-        if (widget) {
-            widget.web3Provider = mockWeb3Provider;
-        }
-        updateStatus(true);
-    };
-
-    (window as any).setDisconnected = function() {
-        mockWeb3Provider = null;
-        if (widget) {
-            widget.web3Provider = null;
-        }
-        updateStatus(false);
-    };
-
-    function updateStatus(connected: boolean) {
-        const statusEl = document.getElementById('status');
-        if (statusEl) {
-            if (connected) {
-                statusEl.textContent = 'Status: Connected';
-                statusEl.className = 'status connected';
-            } else {
-                statusEl.textContent = 'Status: Disconnected';
-                statusEl.className = 'status disconnected';
-            }
-        }
     }
+
+    // Subscribe to account changes to wire provider
+    appKit.subscribeAccount((accountState: any) => {
+        const isConnected = !!accountState?.isConnected;
+        if (isConnected) {
+            const provider = (appKit.getProvider as any)('eip155') || appKit.getWalletProvider();
+            if (widget) widget.web3Provider = provider as any;
+        } else {
+            if (widget) widget.web3Provider = null;
+        }
+    }, 'eip155');
 
     console.log('Gooddollar Savings Widget test page loaded!');
 });

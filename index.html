@@ -87,29 +87,15 @@
 <body>
     <div class="container">
         <h1>Gooddollar Savings Widget - Test Page</h1>
-
-        <div class="widget-section">
-            <h2>Widget Controls</h2>
-            <div class="controls">
-                <label>User Address:</label>
-                <input type="text" id="userAddress" placeholder="0x..." value="0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6">
-
-                <label>Web3 Provider Status:</label>
-                <button onclick="setConnected()">Set Connected</button>
-                <button onclick="setDisconnected()">Set Disconnected</button>
-
-                <div id="status" class="status disconnected">
-                    Status: Disconnected
-                </div>
-            </div>
+        <div>
+          <appkit-button />
         </div>
+
 
         <div class="widget-section">
             <h2>Widget Display</h2>
             <div class="widget-display">
-                <gooddollar-savings-widget
-                    id="savingsWidget"
-                    userAddress="0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6">
+                <gooddollar-savings-widget id="savingsWidget">
                 </gooddollar-savings-widget>
             </div>
         </div>
@@ -118,22 +104,10 @@
             <h2>Usage Examples</h2>
             <div class="controls">
                 <h3>HTML Usage:</h3>
-                <pre><code>&lt;gooddollar-savings-widget
-    userAddress="0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6"
-    .web3Provider=${web3Provider}
-    .connectWallet=${connectWalletFunction}&gt;
-&lt;/gooddollar-savings-widget&gt;</code></pre>
+                <pre><code>&lt;gooddollar-savings-widget&gt;&lt;/gooddollar-savings-widget&gt;</code></pre>
 
                 <h3>JavaScript Usage:</h3>
-                <pre><code>// Set web3 provider
-const widget = document.querySelector('gooddollar-savings-widget');
-widget.web3Provider = window.ethereum;
-
-// Set connect wallet callback
-widget.connectWallet = () => {
-    console.log('Connect wallet clicked!');
-    // Your wallet connection logic here
-};</code></pre>
+                <pre><code>// The test page wires Reown AppKit and sets widget.web3Provider on connect.</code></pre>
             </div>
         </div>
     </div>
