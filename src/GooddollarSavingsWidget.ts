@@ -263,6 +263,13 @@ export class GooddollarSavingsWidget extends LitElement {
       justify-content: center;
       pointer-events: none;
     }
+
+    .error-message {
+      color: #dc2626;
+      font-size: 12px;
+      margin-top: 4px;
+      padding-left: 4px;
+    }
   `
   @property({ type: Object })
   web3Provider: any = null;
@@ -309,6 +316,9 @@ export class GooddollarSavingsWidget extends LitElement {
   @state()
   isClaiming: boolean = false;
 
+  @state()
+  inputError: string = '';
+
   private walletClient: WalletClient | null = null;
   private publicClient: PublicClient<Transport, typeof celo> | null = null;
   private userAddress: string | null = null;
@@ -329,6 +339,9 @@ export class GooddollarSavingsWidget extends LitElement {
   updated(changedProperties: Map<string, any>) {
     if (changedProperties.has('web3Provider')) {
       this.refreshData();
+    }
+    if (changedProperties.has('walletBalance') || changedProperties.has('currentStake')) {
+      this.validateInput();
     }
   }
 
@@ -378,6 +391,7 @@ export class GooddollarSavingsWidget extends LitElement {
             />
             <button class="max-button" @click=${this.handleMaxClick}>Max</button>
           </div>
+          ${this.inputError ? html`<div class="error-message">${this.inputError}</div>` : ''}
         </div>
 
         <div class="rewards-section ${!isConnected ? "hidden" : ""}">
@@ -524,7 +538,8 @@ export class GooddollarSavingsWidget extends LitElement {
   }
 
   handleTabClick(tab: string) {
-    this.activeTab = tab
+    this.activeTab = tab;
+    this.inputError = '';
   }
 
   handleMaxClick() {
@@ -533,11 +548,53 @@ export class GooddollarSavingsWidget extends LitElement {
     } else {
       this.inputAmount = this.toEtherNumber(this.currentStake).toString()
     }
+    this.inputError = '';
   }
 
   handleInputChange(e: Event) {
-    const input = e.target as HTMLInputElement;
+     const input = e.target as HTMLInputElement;
     this.inputAmount = input.value;
+    this.validateInput();
+  }
+
+  private validateInput(force: boolean = false) {
+    this.inputError = '';
+    if (!this.inputAmount || this.inputAmount.trim() === '') {
+      return;
+    }
+
+    // Check for invalid characters (only numbers and decimal point allowed)
+    const validInputRegex = /^[0-9]*\.?[0-9]*$/;
+    if (!validInputRegex.test(this.inputAmount)) {
+      this.inputError = 'Invalid value';
+      return;
+    }
+
+    const numValue = parseFloat(this.inputAmount);
+    if (isNaN(numValue) || numValue < 0) {
+      this.inputError = 'Invalid value';
+      return;
+    }
+    if (numValue === 0 && force) {
+      this.inputError = 'Please enter a valid amount';
+      return;
+    }
+
+    if (this.activeTab === 'stake') {
+      const inputAmountWei = parseEther(this.inputAmount);
+      if (inputAmountWei > this.walletBalance) {
+        this.inputError = 'Insufficient balance';
+        return;
+      }
+    }
+
+    if (this.activeTab === 'unstake') {
+      const inputAmountWei = parseEther(this.inputAmount);
+      if (inputAmountWei > this.currentStake) {
+        this.inputError = 'Max amount exceeded';
+        return;
+      }
+    }
   }
 
   handleConnectWallet() {
@@ -548,6 +605,10 @@ export class GooddollarSavingsWidget extends LitElement {
 
   async handleStake() {
     if (!this.walletClient || !this.userAddress || !this.publicClient) return;
+    this.validateInput(true);
+    if (this.inputError) {
+      return;
+    }
 
     try {
       this.txLoading = true;
@@ -565,6 +626,7 @@ export class GooddollarSavingsWidget extends LitElement {
       if (receipt.status === 'success') {
         await this.refreshData();
         this.inputAmount = '0.0';
+        this.inputError = '';
       }
     } catch (error) {
       console.error('Staking error:', error);
@@ -575,6 +637,10 @@ export class GooddollarSavingsWidget extends LitElement {
 
   async handleUnstake() {
     if (!this.walletClient || !this.userAddress || !this.publicClient) return;
+    this.validateInput(true);
+    if (this.inputError) {
+      return;
+    }
 
     try {
       this.txLoading = true;
@@ -593,6 +659,7 @@ export class GooddollarSavingsWidget extends LitElement {
       if (receipt.status === 'success') {
         await this.refreshData();
         this.inputAmount = '0.0';
+        this.inputError = '';
       }
     } catch (error) {
       console.error('Unstaking error:', error);
