@@ -39,6 +39,7 @@ export class GooddollarSavingsWidget extends LitElement {
       padding: 24px;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
       border: 1px solid #e5e7eb;
+      position: relative;
     }
 
     .header {
@@ -247,6 +248,21 @@ export class GooddollarSavingsWidget extends LitElement {
     .hidden {
       display: none;
     }
+
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 16px;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
   `
   @property({ type: Object })
   web3Provider: any = null;
@@ -421,6 +437,7 @@ export class GooddollarSavingsWidget extends LitElement {
             <span class="stat-value">${this.isLoading ? 'Loading...' : this.formatPercent(this.annualAPR)}</span>
           </div>
         </div>
+        ${this.txLoading || this.isClaiming ? html`<div class="overlay"></div>` : ''}
       </div>
     `;
   }
