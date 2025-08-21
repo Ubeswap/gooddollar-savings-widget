@@ -6,8 +6,9 @@
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc && vite build",
+    "build": "vite build",
     "dev": "vite",
+    "preview": "vite preview",
     "test": "vitest"
   },
   "keywords": [
